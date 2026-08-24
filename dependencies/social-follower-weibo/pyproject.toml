@@ -1,0 +1,12 @@
+[project]
+name = "social-follower-weibo"
+version = "2.0.0"
+description = "微博用户粉丝数据查询工具"
+requires-python = ">=3.9"
+dependencies = [
+    "crawl4weibo>=0.5.2",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.backends._legacy:_Backend"

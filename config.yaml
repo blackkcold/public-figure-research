@@ -1,0 +1,82 @@
+# public-figure-research 配置
+# 通用公众人物调研 skill 的配置中心
+
+# 输出目录：默认 agent 对话工作目录下的 output/
+# 首次运行会询问确认，确认后写入此处
+output_dir: "$PWD/output"
+
+# 依赖 skills 目录（可用 PFR_SKILLS_DIR 环境变量覆盖）
+# 默认 opencode 路径，其他 agent 环境需由 agent 探测并写入此处
+skills_dir: "$HOME/.config/opencode/skills"
+
+# 数据源策略：justoneapi 优先，未配置则用 fallback
+# 首次安装/首次使用时询问用户选择
+data_source:
+  # 是否优先使用 justoneapi（true=优先，false=直接用 fallback）
+  prefer_justoneapi: true
+  # 首次使用是否询问（true=询问一次后写入此处）
+  ask_on_first_use: true
+
+# 领域池：通用多选池，无行业默认
+# 每次调研前询问用户选择领域，可追加关联领域
+domains:
+  - 手机/3C
+  - 汽车
+  - 美妆/个护
+  - 食品/饮料
+  - 服饰/时尚
+  - 游戏/电竞
+  - 金融/财经
+  - 教育/知识
+  - 体育
+  - 音乐/影视/综艺
+  - 其他（用户自定义）
+
+# 平台 → 数据源 skill 映射（薄包装，不新建查询引擎）
+# 主路径调用已有 social-follower-* skill，cookie 仅作 fallback
+platforms:
+  weibo:
+    skill: social-follower-weibo
+    method: search_and_get_user
+    follower_attr: followers_count
+    auth: crawl4weibo 内置 cookie 存储（无需额外配置）
+    cookie_domain: weibo.com
+    cookie_keys: [SCF, SUB, SUBP]
+  douyin:
+    skill: social-follower-douyin
+    method: search_and_get_user
+    follower_attr: follower_count
+    auth: JustOneAPI（env/1Password/密钥文件）
+    cookie_domain: douyin.com
+    cookie_keys: [sessionid, sessionid_ss, ttwid, s_v_web_id, sid_guard, uid_tt, odin_tt, passport_csrf_token, d_ticket, n_mh]
+    fallback: playwright 无头 chromium + cookie（绕过 verify_check）
+  xiaohongshu:
+    skill: social-follower-xiaohongshu
+    method: search_and_get_user
+    follower_attr: fans
+    auth: JustOneAPI（env/1Password/密钥文件）
+    cookie_domain: xiaohongshu.com
+    cookie_keys: [a1, web_session, webId, gid, sec_poison_id, websectiga]
+    fallback: 纯 Python 签名（xhshow）+ cookie
+  bilibili:
+    skill: social-follower-bilibili
+    method: search_and_get_user
+    follower_attr: follower
+    auth: SESSDATA（查粉丝无需，仅 recent-videos 需要）
+    cookie_domain: bilibili.com
+    cookie_keys: [SESSDATA]
+
+# cookie 提取配置
+cookie:
+  # 浏览器探测顺序（rookiepy 解密，macOS 无需 playwright）
+  browsers: [edge, chrome, safari]
+  # 临时目录（默认系统 TMPDIR，权限 0600）
+  temp_dir: "$TMPDIR/public-figure-research"
+  # cookie 有效期（秒），超过即视为过期需重新提取
+  max_age: 3600
+  # 用后即删：任务结束移入 ~/.Trash
+  cleanup: true
+
+# 报告配置
+report:
+  include: [result_table, coverage_stats, failure_troubleshooting, file_paths]

@@ -1,0 +1,36 @@
+# Changelog
+
+本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)（SemVer）。
+
+## [v1.0.0] - 2026-08-24
+
+### 新增
+
+- 通用公众人物调研 skill（`celebrity-research` 的通用化升级版）
+- 微博/B站粉丝查询（crawl4weibo / bilibili-api，无需 justoneapi）
+- 小红书 fallback：纯 Python 签名（xhshow）+ 解密 cookie，绕过 justoneapi
+- 抖音 fallback：playwright 无头 chromium + 注入 cookie，绕过 verify_check 风控
+- 多浏览器 cookie 解密提取（rookiepy，macOS 无需 playwright）
+- 标准报告生成器（结果表 + 覆盖统计 + 失败排障 + 文件路径链接）
+- 领域池、特例询问、输出目录确认等交互流程
+- 隐私声明 + cookie 同意门禁 + 最小化存储 + 用后即删
+- 数据源策略：justoneapi 优先，未配置自动降级到 fallback
+- 一键部署脚本（install.sh，检测已有依赖不重复安装）
+- 环境诊断脚本（check_env.sh，检测依赖 + 数据源状态）
+- **无数据源提示**：无 cookie 且无 justoneapi 时，提示用户登录浏览器或配置 key
+- **依赖打包**：4 个依赖 skill 打包进 `dependencies/`，install.sh 自动安装
+
+### 通用化
+
+- 脚本自定位（`Path(__file__)` / `dirname $0`），不硬编码绝对路径
+- 依赖 skills 目录可用 `PFR_SKILLS_DIR` 环境变量覆盖
+- 输出目录参数化（`$PWD/output`），由 agent 探测写入 config
+- Agent 适配说明：question/todowrite 等通用交互模式，vBuddy 等环境用等价物
+
+### 安全
+
+- cookie 提取需用户明示同意
+- 临时存储权限 `0600`，有效期 ≤1 小时，用后移入 `~/.Trash`
+- 绝不上传、不打印、不进日志、不写入配置文件
+- 彻底脱敏 justoneapi 引用（1Password 引用路径改为通用占位符）
+- 依赖 skill 脱敏：`op://Personal/...` 改为 `op://保险库/条目/字段`，密钥文件路径环境变量可配置

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# 测试/临时
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 敏感信息（绝不提交）
+*.key
+*.pem
+*.crt
+secrets/
+cookies.txt
+*_cookies.json
+*.sessdata
+
+# 输出
+output/
+*.csv
